@@ -1,230 +1,241 @@
-Python 3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)] on win32
-Type "help", "copyright", "credits" or "license()" for more information.
+# Ecommerce Dataset Summary & Professional Dashboard in Python
 
-============================ RESTART: C:/Users/user/AppData/Local/Programs/Python/Python313/git_hub.py ============================
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 
-============================ RESTART: C:/Users/user/AppData/Local/Programs/Python/Python313/git_hub.py ============================
+# ==========================================
+# LOAD DATA
+# ==========================================
+file_path = r"C:/Users/user/Downloads/ecommerce_powerbi_dataset.xlsx"
 
-=================== RESTART: C:/Users/user/AppData/Local/Programs/Python/Python313/data-visualization-project.py ==================
+# Read Excel Sheet
+Data = pd.read_excel(file_path, sheet_name='EcommerceData')
 
-============================== RESTART: C:\Users\user\AppData\Local\Programs\Python\Python313\new2.py =============================
+# ==========================================
+# DISPLAY BASIC INFORMATION
+# ==========================================
+print("\n========== DATASET OVERVIEW ==========")
+print(Data.head())
 
-================ FIRST 5 ROWS ================
+print("\n========== DATASET SHAPE ==========")
+print(Data.shape)
 
-  Order ID              Order Date  ... Quantity   Profit
-0  ORD1000 2024-01-01 00:00:00.000  ...        5   149.93
-1  ORD1001 2024-01-04 16:02:24.724  ...        3   876.90
-2  ORD1002 2024-01-08 08:04:49.447  ...        7   153.73
-3  ORD1003 2024-01-12 00:07:14.171  ...        2  1003.94
-4  ORD1004 2024-01-15 16:09:38.894  ...        9    98.54
+print("\n========== COLUMN NAMES ==========")
+print(Data.columns)
 
-[5 rows x 9 columns]
+print("\n========== MISSING VALUES ==========")
+print(Data.isnull().sum())
 
-================ DATA INFO ================
+print("\n========== DATA TYPES ==========")
+print(Data.dtypes)
 
-<class 'pandas.DataFrame'>
-RangeIndex: 200 entries, 0 to 199
-Data columns (total 9 columns):
- #   Column            Non-Null Count  Dtype         
----  ------            --------------  -----         
- 0   Order ID          200 non-null    str           
- 1   Order Date        200 non-null    datetime64[us]
- 2   Customer Name     200 non-null    str           
- 3   City              200 non-null    str           
- 4   Product Category  200 non-null    str           
- 5   Product Name      200 non-null    str           
- 6   Sales Amount      200 non-null    int64         
- 7   Quantity          200 non-null    int64         
- 8   Profit            200 non-null    float64       
-dtypes: datetime64[us](1), float64(1), int64(2), str(5)
-memory usage: 21.5 KB
-None
+print("\n========== STATISTICAL SUMMARY ==========")
+print(Data.describe())
 
-================ NULL VALUES ================
+# ==========================================
+# CONVERT DATE COLUMN
+# ==========================================
+Data['Order Date'] = pd.to_datetime(Data['Order Date'])
 
-Order ID            0
-Order Date          0
-Customer Name       0
-City                0
-Product Category    0
-Product Name        0
-Sales Amount        0
-Quantity            0
-Profit              0
-dtype: int64
+# ==========================================
+# KPI VALUES
+# ==========================================
+Total_Sales = Data['Total_Amount'].sum()
+Total_Orders = len(Data)
+Total_Customers = Data['Customer_Name'].nunique()
+Top_Category = Data.groupby('Category')['Total_Amount'].sum().idxmax()
 
-================ STATISTICAL SUMMARY ================
+print("\n========== BUSINESS SUMMARY ==========")
+print(f"Total Sales      : ₹{Total_Sales:,.2f}")
+print(f"Total Orders     : {Total_Orders}")
+print(f"Total Customers  : {Total_Customers}")
+print(f"Top Category     : {Top_Category}")
 
-                Order Date  Sales Amount    Quantity       Profit
-count                  200    200.000000  200.000000   200.000000
-mean   2024-12-31 00:00:00   2840.920000    4.725000   521.431550
-min    2024-01-01 00:00:00    504.000000    1.000000    26.150000
-25%    2024-07-01 12:00:00   1645.750000    2.000000   236.340000
-50%    2024-12-31 00:00:00   2996.500000    5.000000   485.770000
-75%    2025-07-01 12:00:00   3850.000000    7.000000   771.265000
-max    2025-12-31 00:00:00   4995.000000    9.000000  1353.510000
-std                    NaN   1283.591394    2.555785   328.656056
+# ==========================================
+# POWER BI STYLE THEME
+# ==========================================
+plt.style.use('dark_background')
 
-================ COLUMN NAMES ================
+mpl.rcParams['font.size'] = 11
+mpl.rcParams['figure.facecolor'] = '#121212'
+mpl.rcParams['axes.facecolor'] = '#1f1f2e'
+mpl.rcParams['axes.edgecolor'] = 'white'
+mpl.rcParams['axes.labelcolor'] = 'white'
+mpl.rcParams['xtick.color'] = 'white'
+mpl.rcParams['ytick.color'] = 'white'
 
-Index(['Order ID', 'Order Date', 'Customer Name', 'City', 'Product Category',
-       'Product Name', 'Sales Amount', 'Quantity', 'Profit'],
-      dtype='str')
+# ==========================================
+# CREATE FIGURE
+# ==========================================
+fig = plt.figure(figsize=(18, 10), constrained_layout=True)
 
-================ OVERALL SUMMARY ================
+# GRID LAYOUT
+Grid = fig.add_gridspec(3, 4)
 
-Total Sales      : 568184
-Total Profit     : 104286.31
-Total Quantity   : 945
-Total Orders     : 200
+# KPI CARDS
+ax_kpi1 = fig.add_subplot(Grid[0, 0])
+ax_kpi2 = fig.add_subplot(Grid[0, 1])
+ax_kpi3 = fig.add_subplot(Grid[0, 2])
+ax_kpi4 = fig.add_subplot(Grid[0, 3])
 
-================================================
-SUMMARY REPORT SAVED SUCCESSFULLY
-File Name : summary_report.xlsx
-================================================
+# CHARTS
+ax1 = fig.add_subplot(Grid[1, 0:2])
+ax2 = fig.add_subplot(Grid[1, 2:4])
+ax3 = fig.add_subplot(Grid[2, :])
 
-Cleaned data saved as cleaned_data.xlsx
+# ==========================================
+# KPI CARD FUNCTION
+# ==========================================
+def KPI_CARD(ax, title, value, color):
 
-=========================== RESTART: C:\Users\user\AppData\Local\Programs\Python\Python313\matplotpr1.py ==========================
+    ax.set_facecolor('#242444')
 
-========== DATASET OVERVIEW ==========
-  Order ID  Order Date Customer_Name  ... Total_Amount Payment Method Order Status
-0  ORD1000  2024-04-07   Sanjana Rao  ...    184100.00            UPI    Delivered
-1  ORD1001  2024-05-02    Riya Verma  ...     44028.00            COD      Shipped
-2  ORD1002  2024-05-08    Riya Verma  ...    116805.30            COD      Shipped
-3  ORD1003  2024-06-06    Amit Singh  ...     37304.60    Credit Card    Cancelled
-4  ORD1004  2024-03-19   Rahul Gupta  ...     89425.95    Credit Card    Delivered
+    for spine in ax.spines.values():
+        spine.set_visible(False)
 
-[5 rows x 14 columns]
+    ax.set_xticks([])
+    ax.set_yticks([])
 
-========== DATASET SHAPE ==========
-(300, 14)
+    ax.text(
+        0.05,
+        0.65,
+        title,
+        fontsize=14,
+        color='lightgray',
+        transform=ax.transAxes
+    )
 
-========== COLUMN NAMES ==========
-Index(['Order ID', 'Order Date', 'Customer_Name', 'City', 'State', 'Product',
-       'Category', 'Sub-Category', 'Quantity', 'Unit Price', 'Discount',
-       'Total_Amount', 'Payment Method', 'Order Status'],
-      dtype='str')
+    ax.text(
+        0.05,
+        0.25,
+        value,
+        fontsize=22,
+        fontweight='bold',
+        color=color,
+        transform=ax.transAxes
+    )
 
-========== MISSING VALUES ==========
-Order ID          0
-Order Date        0
-Customer_Name     0
-City              0
-State             0
-Product           0
-Category          0
-Sub-Category      0
-Quantity          0
-Unit Price        0
-Discount          0
-Total_Amount      0
-Payment Method    0
-Order Status      0
-dtype: int64
+# ==========================================
+# DISPLAY KPI CARDS
+# ==========================================
+KPI_CARD(ax_kpi1, "Total Sales", f"₹ {Total_Sales:,.0f}", '#00FFB3')
+KPI_CARD(ax_kpi2, "Total Orders", f"{Total_Orders}", '#4DA6FF')
+KPI_CARD(ax_kpi3, "Customers", f"{Total_Customers}", '#FFD700')
+KPI_CARD(ax_kpi4, "Top Category", f"{Top_Category}", '#FF6B6B')
 
-========== DATA TYPES ==========
-Order ID              str
-Order Date            str
-Customer_Name         str
-City                  str
-State                 str
-Product               str
-Category              str
-Sub-Category          str
-Quantity            int64
-Unit Price          int64
-Discount            int64
-Total_Amount      float64
-Payment Method        str
-Order Status          str
-dtype: object
+# ==========================================
+# CHART 1 : CATEGORY SALES
+# ==========================================
+Category_Sales = (
+    Data.groupby('Category')['Total_Amount']
+    .sum()
+    .sort_values(ascending=False)
+)
 
-========== STATISTICAL SUMMARY ==========
-         Quantity    Unit Price    Discount   Total_Amount
-count  300.000000    300.000000  300.000000     300.000000
-mean     2.946667  25014.350000   10.000000   67057.105167
-std      1.389337  14264.470018    7.094677   50858.988171
-min      1.000000    307.000000    0.000000     782.850000
-25%      2.000000  13562.500000    5.000000   28214.475000
-50%      3.000000  24172.000000   10.000000   53420.300000
-75%      4.000000  37139.250000   15.000000   97920.475000
-max      5.000000  49858.000000   20.000000  196898.250000
+bars = ax1.bar(
+    Category_Sales.index,
+    Category_Sales.values,
+    edgecolor='white',
+    linewidth=1.5
+)
 
-========== BUSINESS SUMMARY ==========
-Total Sales      : ₹20,117,131.55
-Total Orders     : 300
-Total Customers  : 8
-Top Category     : Fashion
+ax1.set_title(
+    'Category Wise Sales',
+    fontsize=16,
+    fontweight='bold'
+)
 
-=========================== RESTART: C:\Users\user\AppData\Local\Programs\Python\Python313\matplotpr1.py ==========================
+ax1.tick_params(axis='x', rotation=20)
 
-========== DATASET OVERVIEW ==========
-  Order ID  Order Date Customer_Name  ... Total_Amount Payment Method Order Status
-0  ORD1000  2024-04-07   Sanjana Rao  ...    184100.00            UPI    Delivered
-1  ORD1001  2024-05-02    Riya Verma  ...     44028.00            COD      Shipped
-2  ORD1002  2024-05-08    Riya Verma  ...    116805.30            COD      Shipped
-3  ORD1003  2024-06-06    Amit Singh  ...     37304.60    Credit Card    Cancelled
-4  ORD1004  2024-03-19   Rahul Gupta  ...     89425.95    Credit Card    Delivered
+# VALUE LABELS
+for bar in bars:
 
-[5 rows x 14 columns]
+    value = bar.get_height()
 
-========== DATASET SHAPE ==========
-(300, 14)
+    ax1.text(
+        bar.get_x() + bar.get_width()/2,
+        value,
+        f'{value:,.0f}',
+        ha='center',
+        va='bottom',
+        fontsize=9
+    )
 
-========== COLUMN NAMES ==========
-Index(['Order ID', 'Order Date', 'Customer_Name', 'City', 'State', 'Product',
-       'Category', 'Sub-Category', 'Quantity', 'Unit Price', 'Discount',
-       'Total_Amount', 'Payment Method', 'Order Status'],
-      dtype='str')
+# ==========================================
+# CHART 2 : PAYMENT METHOD SHARE
+# ==========================================
+Payment_Data = Data['Payment Method'].value_counts()
 
-========== MISSING VALUES ==========
-Order ID          0
-Order Date        0
-Customer_Name     0
-City              0
-State             0
-Product           0
-Category          0
-Sub-Category      0
-Quantity          0
-Unit Price        0
-Discount          0
-Total_Amount      0
-Payment Method    0
-Order Status      0
-dtype: int64
+ax2.pie(
+    Payment_Data.values,
+    labels=Payment_Data.index,
+    autopct='%1.1f%%',
+    startangle=90,
+    wedgeprops={
+        'edgecolor':'white',
+        'linewidth':1
+    }
+)
 
-========== DATA TYPES ==========
-Order ID              str
-Order Date            str
-Customer_Name         str
-City                  str
-State                 str
-Product               str
-Category              str
-Sub-Category          str
-Quantity            int64
-Unit Price          int64
-Discount            int64
-Total_Amount      float64
-Payment Method        str
-Order Status          str
-dtype: object
+ax2.set_title(
+    'Payment Method Distribution',
+    fontsize=16,
+    fontweight='bold'
+)
 
-========== STATISTICAL SUMMARY ==========
-         Quantity    Unit Price    Discount   Total_Amount
-count  300.000000    300.000000  300.000000     300.000000
-mean     2.946667  25014.350000   10.000000   67057.105167
-std      1.389337  14264.470018    7.094677   50858.988171
-min      1.000000    307.000000    0.000000     782.850000
-25%      2.000000  13562.500000    5.000000   28214.475000
-50%      3.000000  24172.000000   10.000000   53420.300000
-75%      4.000000  37139.250000   15.000000   97920.475000
-max      5.000000  49858.000000   20.000000  196898.250000
+# ==========================================
+# CHART 3 : MONTHLY SALES TREND
+# ==========================================
+Data['Month'] = Data['Order Date'].dt.strftime('%b')
 
-========== BUSINESS SUMMARY ==========
-Total Sales      : ₹20,117,131.55
-Total Orders     : 300
-Total Customers  : 8
-Top Category     : Fashion
+Monthly_Sales = (
+    Data.groupby('Month')['Total_Amount']
+    .sum()
+)
+
+Month_Order = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+Monthly_Sales = Monthly_Sales.reindex(Month_Order)
+
+ax3.plot(
+    Monthly_Sales.index,
+    Monthly_Sales.values,
+    marker='o',
+    linewidth=3,
+    markersize=8
+)
+
+ax3.fill_between(
+    Monthly_Sales.index,
+    Monthly_Sales.values,
+    alpha=0.2
+)
+
+ax3.set_title(
+    'Monthly Sales Trend',
+    fontsize=16,
+    fontweight='bold'
+)
+
+ax3.set_xlabel('Month')
+ax3.set_ylabel('Sales Amount')
+
+ax3.grid(True, linestyle='--', alpha=0.3)
+
+# ==========================================
+# MAIN TITLE
+# ==========================================
+fig.suptitle(
+    'ECOMMERCE SALES DASHBOARD',
+    fontsize=24,
+    fontweight='bold',
+    color='white'
+)
+
+# ==========================================
+# SHOW DASHBOARD
+# ==========================================
+plt.show()
+
+
